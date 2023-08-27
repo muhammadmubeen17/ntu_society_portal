@@ -1,0 +1,143 @@
+html {
+    font-size: 100%;
+}
+
+@media (max-width: 1024px) {
+    html {
+        font-size: 90%;
+    }
+}
+
+@media (max-width: 768px) {
+    html {
+        font-size: 80%;
+    }
+}
+
+@media (max-width: 425px) {
+    html {
+        font-size: 70%;
+    }
+}
+
+@media (max-width: 375px) {
+    html {
+        font-size: 60%;
+    }
+}
+
+@media (max-width: 320px) {
+    html {
+        font-size: 50%;
+    }
+}
+
+.login-block {
+    height: 100vh;
+    padding: 50px 0px;
+}
+
+.content-header .page-breadcrumb.breadcrumb {
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+    box-shadow: none;
+    padding: 3px 10px;
+    margin-top: 15px;
+    border: 0px !important;
+    background-color: #FFF;
+    font-size: 14px;
+    color: #444;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "";
+}
+
+.content-header h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #404040;
+    margin: 15px 0;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.add-btn, .save-btn {
+    display: block;
+    float: right;
+    width: 75px;
+    text-align: center;
+    color: #444;
+    line-height: 18px;
+    margin: 0 3px;
+    background: none;
+    border: none;
+}
+
+.add-btn i {
+    font-size: 2.5rem;
+    color: #3497d0;
+    margin-bottom: 10px;
+}
+
+.add-btn:hover, .add-btn:hover i {
+    color: #257aab;
+}
+
+.save-btn i {
+    font-size: 2.5rem;
+    color: #3dc35c;
+    margin-bottom: 10px;
+}
+
+.save-btn:hover, .save-btn:hover i {
+    color: #2aa146;
+}
+
+.main-sidebar {
+    position: fixed !important;
+}
+
+.main-sidebar .sidebar {
+    width: inherit;
+    position: fixed;
+    margin-top: 15px;
+}
+
+.info-box .info-box-icon-bg {
+    height: 135px;
+    width: 135px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.profile_picture img {
+    cursor: pointer;
+}
+
+.society_picture img {
+    width: 250px;
+    height: 250px;
+    cursor: pointer;
+}
+
+/* Select 2 custom edits */
+
+.select2-container .select2-selection--single {
+    height: auto;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    top: 8px;
+    right: 10px;
+}
+
+#form_title {
+    border: none;
+    box-shadow: none;
+    outline: none;
+    font-size: 24px;
+    font-weight: 700;
+}

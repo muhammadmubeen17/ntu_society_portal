@@ -1,0 +1,13 @@
+{
+    "Users": true,
+    "Products": true,
+    "Orders": true,
+    "Customers": true,
+    "Reports": true,
+    "Settings": true,
+    "Pages": true,
+    "Society": true,
+    "Students": true,
+    "Teachers": true,
+    "Staff": true
+}
