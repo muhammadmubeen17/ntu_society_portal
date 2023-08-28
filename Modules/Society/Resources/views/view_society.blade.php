@@ -1,6 +1,4 @@
-{{ view('admin.layouts.header') }}
-
-{{ view('admin.sidebar') }}
+@include('header')
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -38,7 +36,7 @@
                     <div class="card card-primary card-outline">
                         <div class="card-body box-profile">
                             <div class="text-center">
-                                <img class="img-fluid "
+                                <img class="img-fluid" style="height: 50vh"
                                     src="{{ $society->image_path ? asset('uploads/societies/uploads/' . $society->image_path) : asset('images/no-image.jpg') }}"
                                     alt="User profile picture">
                             </div>
@@ -135,6 +133,64 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Registration Form Responses (Total: {{ $society['society_form_responses_count'] }})
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <table id="form_response_table" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Student ID</th>
+                                        <th>Student Name</th>
+                                        <th>Form title</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $index = 1;
+                                    @endphp
+                                    @foreach ($society['society_form_responses'] as $form)
+                                        <tr>
+                                            <td>{{ $index }}</td>
+                                            <td>{{ $form['users']['student_id'] }}</td>
+                                            <td>{{ $form['users']['student']['full_name'] }}</td>
+                                            <td>{{ $form['form_title'] }}</td>
+                                            <td>{{ $form['status'] }}</td>
+                                            <td align="center">
+                                                <div class="d-flex flex-row justify-content-around">
+                                                    <a href="{{ route('view.society.form.response', [$society->id, $form->id]) }}"
+                                                        title="View Form">
+                                                        <i class="fa-solid fa-eye"></i>
+                                                    </a>
+                                                    <form
+                                                        action="{{ route('destroy.society.form.response', [$society->id, $form->id]) }}"
+                                                        method="post" class="d-inline">
+                                                        @csrf
+                                                        <a href="javascript::void(0)"
+                                                            onclick="confirm_form_delete(this)" class="del_btn"
+                                                            title="Delete Form">
+                                                            <i class="fas fa-user-minus text-danger"></i>
+                                                        </a>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @php
+                                            $index++;
+                                        @endphp
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <h5 class="mb-2 mt-3">Members Detail</h5>
@@ -160,9 +216,9 @@
                                     @foreach ($society['members'] as $member)
                                         <tr>
                                             <td>{{ $member['id'] }}</td>
-                                            <td>{{ $member['student']['full_name'] }}</td>
-                                            <td>{{ $member['student']['reg_number'] }}</td>
-                                            <td>{{ $member['student']['email'] }}</td>
+                                            <td>{{ $member['user']['student']['full_name'] }}</td>
+                                            <td>{{ $member['user']['student']['reg_number'] }}</td>
+                                            <td>{{ $member['user']['student']['email'] }}</td>
                                             <td align="center">
                                                 <div class="d-flex flex-row justify-content-around">
                                                     <form
@@ -192,7 +248,4 @@
 </div>
 <!-- /.content-wrapper -->
 
-{{ view('admin.control-sidebar') }}
-
-{{ view('admin.layouts.footer') }}
-{{ view('society::layouts.footer') }}
+@include('footer', ['module' => 'society'])

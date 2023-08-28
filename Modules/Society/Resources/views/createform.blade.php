@@ -1,6 +1,4 @@
-{{ view('admin.layouts.header') }}
-
-{{ view('admin.sidebar') }}
+@include('header')
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -63,10 +61,9 @@
 </div>
 <!-- /.content-wrapper -->
 
-{{ view('admin.control-sidebar') }}
 
 <script>
     var storeformdata_route = '{{ route("society.storeformdata") }}'
 </script>
-{{ view('admin.layouts.footer') }}
-{{ view('society::layouts.footer') }}
+
+@include('footer', ['module' => 'society'])

@@ -50,7 +50,7 @@
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Phone</th>
-                                        <th>Role</th>
+                                        {{-- <th>Role</th> --}}
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -65,7 +65,7 @@
                                             <td>{{ $user->full_name }}</td>
                                             <td>{{ $user->email }}</td>
                                             <td>{{ $user->phone_number }}</td>
-                                            <td>{{ ucwords(str_replace('_', ' ', $user->role)) }}</td>
+                                            {{-- <td>{{ ucwords(str_replace('_', ' ', $user->role)) }}</td> --}}
 
                                             <td align="center">
                                                 @if ($user->is_active == 1)
@@ -103,7 +103,7 @@
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Phone</th>
-                                        <th>Role</th>
+                                        {{-- <th>Role</th> --}}
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>

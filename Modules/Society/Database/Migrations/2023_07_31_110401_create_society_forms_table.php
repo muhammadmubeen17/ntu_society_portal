@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('society_id')->constrained('societies')->onDelete('cascade');
             $table->string('form_title')->nullable();
             $table->json('form_data');
+            $table->boolean('active')->nullable();
             $table->timestamps();
         });
     }

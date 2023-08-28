@@ -29,19 +29,19 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        DB::table('students')->insert([
-            'id'            => 1,
-            'full_name'     => 'Mubeen Ahmad',
-            'username'      => 'mubeenahmad',
-            'email'         => 'mubeenahmad1920@gmail.com',
-            'phone_number'  => '03000000000',
-            'reg_number'    => '19-NTU-CS-1147',
-            'role'          => 'member',
-            'is_active'     => '1',
-            'password'      => bcrypt('Test@123!'),
-            'created_at'    => Carbon::now(),
-            'updated_at'    => Carbon::now(),
-        ]);
+        // DB::table('students')->insert([
+        //     'id'            => 1,
+        //     'full_name'     => 'Mubeen Ahmad',
+        //     'username'      => 'mubeenahmad',
+        //     'email'         => 'mubeenahmad1920@gmail.com',
+        //     'phone_number'  => '03000000000',
+        //     'reg_number'    => '19-NTU-CS-1147',
+        //     'role'          => 'member',
+        //     'is_active'     => '1',
+        //     'password'      => bcrypt('Test@123!'),
+        //     'created_at'    => Carbon::now(),
+        //     'updated_at'    => Carbon::now(),
+        // ]);
 
     }
 

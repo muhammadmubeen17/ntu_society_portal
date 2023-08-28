@@ -92,7 +92,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="card-body p-0">
+                                            {{-- <div class="card-body p-0">
                                                 <ul class="nav flex-column">
                                                     <li class="nav-item py-2">
                                                         <span class="nav-link text-dark font-weight-bold">
@@ -142,7 +142,7 @@
                                                         </span>
                                                     </li>
                                                 </ul>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                     </div>
                                 </div>

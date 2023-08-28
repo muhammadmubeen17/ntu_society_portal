@@ -1,6 +1,4 @@
-{{ view('admin.layouts.header') }}
-
-{{ view('admin.sidebar') }}
+@include('header')
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -51,7 +49,7 @@
                                         <th>Registration No.</th>
                                         <th>Email</th>
                                         <th>Phone</th>
-                                        <th>Role</th>
+                                        {{-- <th>Role</th> --}}
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -67,7 +65,7 @@
                                             <td>{{ $user->reg_number }}</td>
                                             <td>{{ $user->email }}</td>
                                             <td>{{ $user->phone_number }}</td>
-                                            <td>{{ ucwords(str_replace('_', ' ', $user->role)) }}</td>
+                                            {{-- <td>{{ ucwords(str_replace('_', ' ', $user->role)) }}</td> --}}
 
                                             <td align="center">
                                                 @if ($user->is_active == 1)
@@ -106,7 +104,7 @@
                                         <th>Registration No.</th>
                                         <th>Email</th>
                                         <th>Phone</th>
-                                        <th>Role</th>
+                                        {{-- <th>Role</th> --}}
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -125,7 +123,4 @@
 </div>
 <!-- /.content-wrapper -->
 
-{{ view('admin.control-sidebar') }}
-
-{{ view('admin.layouts.footer') }}
-{{ view('users::layouts.footer') }}
+@include('footer', ['module' => 'users'])

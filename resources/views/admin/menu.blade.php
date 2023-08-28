@@ -1,6 +1,6 @@
 <li class="nav-item">
     <a href="{{ route('dashboard') }}" class="nav-link {{ request()->is('admin') ? 'active' : '' }}">
-        <i class="nav-icon fas fa-tachometer-alt"></i>
+        <i class="nav-icon fa-solid fa-chart-line"></i>
         <p>
             Dashboard
         </p>
@@ -99,6 +99,13 @@
             </a>
         </li>
         <li class="nav-item">
+            <a href="{{ route('view.society.registrationforms') }}"
+                class="nav-link {{ request()->is('admin/society/registrationforms') ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Registration Forms</p>
+            </a>
+        </li>
+        <li class="nav-item">
             <a href="{{ route('create.society') }}"
                 class="nav-link {{ request()->is('admin/society/create', 'admin/society/create/*') ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
@@ -106,6 +113,14 @@
             </a>
         </li>
     </ul>
+</li>
+<li class="nav-item">
+    <a href="{{ route('societies.discussions') }}" class="nav-link {{ request()->is('admin/discussions', 'admin/discussions/*') ? 'active' : '' }}">
+        <i class="nav-icon fa-brands fa-rocketchat"></i>
+        <p>
+            Discussions
+        </p>
+    </a>
 </li>
 
 

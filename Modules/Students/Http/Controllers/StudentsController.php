@@ -46,7 +46,7 @@ class StudentsController extends Controller
             'registration_number' => 'required|unique:students,reg_number',
             'password' => 'required|min:8',
             'phone' => 'required|min:11',
-            'user_role' => 'required',
+            // 'user_role' => 'required',
             'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
@@ -57,7 +57,7 @@ class StudentsController extends Controller
         $phone = $request->phone;
         $password = $request->password;
         $is_active = $request->is_active;
-        $user_role = $request->user_role;
+        // $user_role = $request->user_role;
 
         
         $student = new Students();
@@ -75,7 +75,7 @@ class StudentsController extends Controller
         $student->phone_number = $phone;
         $student->password = Hash::make($password);
         $student->is_active = !empty($is_active) ? '1' : '0';
-        $student->role = $user_role;
+        // $student->role = $user_role;
 
         $student->save();
 
@@ -132,7 +132,7 @@ class StudentsController extends Controller
             'registration_number' => "required|unique:students,reg_number,$id",
             'password' => 'nullable|min:8',
             'phone' => 'required|min:11',
-            'user_role' => 'required',
+            // 'user_role' => 'required',
             'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
@@ -149,7 +149,7 @@ class StudentsController extends Controller
         }
 
         $student->is_active = $request->has('is_active') ? '1' : '0';
-        $student->role = $request->input('user_role');
+        // $student->role = $request->input('user_role');
 
         if ($request->hasFile('image_path')) {
             // Delete previous image

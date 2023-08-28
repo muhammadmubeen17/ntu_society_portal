@@ -1,6 +1,4 @@
-{{ view('admin.layouts.header') }}
-
-{{ view('admin.sidebar') }}
+@include('header')
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -38,6 +36,11 @@
         <div class="container-fluid">
             <h3 class="mb-4">Societies</h3>
             <div class="row">
+                @php
+                    if (empty($societies)) {
+                        echo "<div class='text-center mx-auto'>No records Found</div>";
+                    }   
+                @endphp
                 @foreach ($societies as $society)
                     <div class="col-md-4 col-sm-6 col-12">
                         <a href="{{ route('society.view', $society->id) }}" class="text-decoration-none text-dark">
@@ -47,15 +50,15 @@
 
                                 <div class="info-box-content">
                                     <h4 class="info-box-text">{{ $society->name }}</h4>
-                                    <span class="info-box-number font-weight-normal">
+                                    <span class="info-box-number font-weight-normal" style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
                                         <span class="font-weight-bold">Convener:</span>
                                         {{ $society->convener->full_name ?? 'N/A' }}
                                     </span>
-                                    <span class="info-box-number font-weight-normal">
+                                    <span class="info-box-number font-weight-normal" style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
                                         <span class="font-weight-bold">President:</span>
                                         {{ $society->president->full_name ?? 'N/A' }}
                                     </span>
-                                    <span class="info-box-number font-weight-normal">
+                                    <span class="info-box-number font-weight-normal" style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">
                                         <span class="font-weight-bold">Members:</span>
                                         {{ $society->totalMembers }}
                                     </span>
@@ -73,7 +76,4 @@
 </div>
 <!-- /.content-wrapper -->
 
-{{ view('admin.control-sidebar') }}
-
-{{ view('admin.layouts.footer') }}
-{{ view('users::layouts.footer') }}
+@include('footer', ['module' => 'society'])

@@ -1,6 +1,4 @@
-{{ view('admin.layouts.header') }}
-
-{{ view('admin.sidebar') }}
+@include('header')
 
 @php
 
@@ -124,7 +122,7 @@ $user = $page_data;
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="card-body p-0">
+                                            {{-- <div class="card-body p-0">
                                                 <ul class="nav flex-column">
                                                     <li class="nav-item py-2">
                                                         <span class="nav-link text-dark font-weight-bold">
@@ -160,7 +158,7 @@ $user = $page_data;
                                                         </span>
                                                     </li>
                                                 </ul>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                     </div>
                                 </div>
@@ -187,7 +185,4 @@ $user = $page_data;
 </div>
 <!-- /.content-wrapper -->
 
-{{ view('admin.control-sidebar') }}
-
-{{ view('admin.layouts.footer') }}
-{{ view('users::layouts.footer') }}
+@include('footer', ['module' => 'users'])

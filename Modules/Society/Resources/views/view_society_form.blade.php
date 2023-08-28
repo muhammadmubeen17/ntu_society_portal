@@ -1,6 +1,4 @@
-{{ view('admin.layouts.header') }}
-
-{{ view('admin.sidebar') }}
+@include('header')
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -45,58 +43,58 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-12" id="formdata_wrapper">
-                            <form action="" method="post">
-                                @csrf
-                                @foreach ($society->society_form->form_data as $field)
-                                    @if ($field->type === 'text' || $field->type === 'email' || $field->type === 'number')
-                                        <div class="form-group">
-                                            <label>{{ $field->label }}</label>
-                                            <input type="{{ $field->type }}" name="{{ $field->name }}"
-                                                class="form-control" {{ $field->required ? 'required' : '' }}>
-                                        </div>
-                                    @elseif ($field->type === 'radio')
-                                        <div class="form-group">
-                                            <label>{{ $field->label }}</label><br>
+                            @csrf
+                            @foreach ($society->society_form->form_data as $field)
+                                @if ($field->type === 'text' || $field->type === 'email' || $field->type === 'number')
+                                    <div class="form-group">
+                                        <label>{{ $field->label }}</label>
+                                        <input type="{{ $field->type }}" name="{{ $field->name }}" placeholder="{{ $field->placeholder }}"
+                                            class="form-control" {{ $field->required ? 'required' : '' }}>
+                                    </div>
+                                @elseif ($field->type === 'radio')
+                                    <div class="form-group">
+                                        <label>{{ $field->label }}</label><br>
+                                        @foreach ($field->options as $option)
+                                            <div class="form-check form-check-inline">
+                                                <input type="radio" name="{{ $option->name }}"
+                                                    id="{{ $option->id }}" value="{{ $option->value }}"
+                                                    class="form-check-input">
+                                                <label for="{{ $option->id }}"
+                                                    class="form-check-label">{{ $option->label }}</label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @elseif ($field->type === 'checkbox')
+                                    <div class="form-group">
+                                        <label>{{ $field->label }}</label><br>
+                                        @foreach ($field->options as $option)
+                                            <div class="form-check form-check-inline">
+                                                <input type="checkbox" name="{{ $option->name }}"
+                                                    id="{{ $option->id }}" value="{{ $option->value }}"
+                                                    class="form-check-input">
+                                                <label for="{{ $option->id }}"
+                                                    class="form-check-label">{{ $option->label }}</label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @elseif ($field->type === 'select')
+                                    <div class="form-group">
+                                        <label>{{ $field->label }}</label>
+                                        <select name="{{ $field->name }}" class="form-control select2"
+                                            {{ $field->required ? 'required' : '' }}>
                                             @foreach ($field->options as $option)
-                                                <div class="form-check form-check-inline">
-                                                    <input type="radio" name="{{ $option->name }}"
-                                                        id="{{ $option->id }}" value="{{ $option->value }}"
-                                                        class="form-check-input">
-                                                    <label for="{{ $option->id }}"
-                                                        class="form-check-label">{{ $option->label }}</label>
-                                                </div>
+                                                <option value="{{ $option->value }}">{{ $option->label }}</option>
                                             @endforeach
-                                        </div>
-                                    @elseif ($field->type === 'checkbox')
-                                        <div class="form-group">
-                                            <label>{{ $field->label }}</label><br>
-                                            @foreach ($field->options as $option)
-                                                <div class="form-check form-check-inline">
-                                                    <input type="checkbox" name="{{ $option->name }}"
-                                                        id="{{ $option->id }}" value="{{ $option->value }}"
-                                                        class="form-check-input">
-                                                    <label for="{{ $option->id }}"
-                                                        class="form-check-label">{{ $option->label }}</label>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @elseif ($field->type === 'select')
-                                        <div class="form-group">
-                                            <label>{{ $field->label }}</label>
-                                            <select name="{{ $field->name }}" class="form-control select2"
-                                                {{ $field->required ? 'required' : '' }}>
-                                                @foreach ($field->options as $option)
-                                                    <option value="{{ $option->value }}">{{ $option->label }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    @endif
-                                @endforeach
+                                        </select>
+                                    </div>
+                                @endif
+                            @endforeach
 
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </form>
+                            <button type="button" id="submitFormResponse" class="btn btn-primary">Submit</button>
                         </div>
                         <input type="text" name="society_id" value="{{ $society->id }}" hidden>
+                        <input type="text" name="form_id" value="{{ $society->society_form->id }}" hidden>
+                        <input type="text" name="form_active" value="{{ $society->society_form->active }}" hidden>
                     </div>
                 </div>
                 <!-- /.card-body -->
@@ -108,10 +106,8 @@
 </div>
 <!-- /.content-wrapper -->
 
-{{ view('admin.control-sidebar') }}
-
 <script>
-    var storeformdata_route = '{{ route('society.storeformdata') }}'
+    var submitformdata_route = '{{ route('society.submit.formdata') }}'
 </script>
-{{ view('admin.layouts.footer') }}
-{{ view('society::layouts.footer') }}
+
+@include('footer', ['module' => 'society'])

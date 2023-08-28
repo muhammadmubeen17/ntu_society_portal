@@ -5,6 +5,7 @@ namespace Modules\Society\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\Students\Entities\Students;
+use Modules\Users\Entities\Users;
 
 class SocietyMembers extends Model
 {
@@ -20,5 +21,10 @@ class SocietyMembers extends Model
     public function student()
     {
         return $this->belongsTo(Students::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(Users::class);
     }
 }

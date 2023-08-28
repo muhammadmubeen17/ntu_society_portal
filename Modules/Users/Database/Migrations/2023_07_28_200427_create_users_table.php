@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('password');
             $table->foreignId('student_id')->nullable()->constrained('students')->onDelete('cascade');
             $table->foreignId('staff_id')->nullable()->constrained('staff')->onDelete('cascade');
-            $table->enum('role', ['student', 'staff'])->default('staff'); // Updated roles
+            $table->enum('role', ['student', 'staff', 'admin'])->default('staff'); // Updated roles
             $table->enum('is_active', ['0', '1'])->default('0');
             $table->timestamps();
         });
@@ -33,8 +33,7 @@ return new class extends Migration
             'email'         => 'mubeenahmad1920@gmail.com',
             'password'      => bcrypt('Test@123!'),
             'is_active'     => '1',
-            'role'          => 'student',
-            'student_id'    => 1,
+            'role'          => 'admin',
             'created_at'    => Carbon::now(),
             'updated_at'    => Carbon::now(),
         ]);

@@ -54,14 +54,14 @@ $(document).ready(function () {
         var inputHtml = '';
 
         if (inputType === 1) {
-
-            inputHtml = `<input type="text" name="field${fieldCount}" placeholder="${label}" class="form-control">`;
+            var placeholder = prompt("Enter Placeholder:");
+            inputHtml = `<input type="text" name="field${fieldCount}" placeholder="${placeholder}" class="form-control">`;
         } else if (inputType === 2) {
-
-            inputHtml = `<input type="number" name="field${fieldCount}" placeholder="${label}" class="form-control">`;
+            var placeholder = prompt("Enter Placeholder:");
+            inputHtml = `<input type="number" name="field${fieldCount}" placeholder="${placeholder}" class="form-control">`;
         } else if (inputType === 3) {
-
-            inputHtml = `<input type="email" name="field${fieldCount}" placeholder="${label}" class="form-control">`;
+            var placeholder = prompt("Enter Placeholder:");
+            inputHtml = `<input type="email" name="field${fieldCount}" placeholder="${placeholder}" class="form-control">`;
         } else if (inputType === 4) {
 
             var options = prompt("Enter options separated by comma (Option 1, Option 2, ...):");
@@ -129,13 +129,15 @@ $(document).ready(function () {
                             $(this).find('select').length > 0 ? 'select' : 'text';
             var required = true; // Modify this based on your logic
 
-            if (fieldType === 'text' || fieldType === 'email') {
+            if (fieldType === 'text' || fieldType === 'email' || fieldType === 'number') {
                 var name = $(this).find('input:first').attr('name');
+                var placeholder = $(this).find('input:first').attr('placeholder');
             }
 
             var fieldData = {
                 name: name ? name : null,
                 label: label,
+                placeholder: placeholder,
                 type: fieldType,
                 required: required,
             };
@@ -153,6 +155,7 @@ $(document).ready(function () {
                 fieldData.options = options;
             } else if (fieldType === 'select') {
                 var options = [];
+                fieldData.name = $(this).find('select').attr('name');
                 $(this).find('select option').each(function () {
                     options.push({
                         label: $(this).text(),
@@ -184,6 +187,7 @@ $(document).ready(function () {
                         icon: 'success',
                         title: 'Form created successfully.'
                     });
+                    window.location.href = response.redirect
                 } else {
                     Toast.fire({
                         icon: 'error',
@@ -207,6 +211,208 @@ $(document).ready(function () {
     $("input[form-active-switch]").on('switchChange.bootstrapSwitch', function (event, state) {
         $(this).closest(".form-active-status").submit();
     });
+
+
+    // Save form data
+    $('#submitFormResponse').click(function () {
+        var formFields = [];
+
+        $('#formdata_wrapper .form-group').each(function (index) {
+            console.log(index);
+            var label = $(this).find('label:first').text();
+            var fieldType = $(this).find('input[type="radio"]').length > 0 ? 'radio' :
+                $(this).find('input[type="checkbox"]').length > 0 ? 'checkbox' :
+                    $(this).find('input[type="email"]').length > 0 ? 'email' :
+                        $(this).find('input[type="number"]').length > 0 ? 'number' :
+                            $(this).find('select').length > 0 ? 'select' : 'text';
+            var required = true; // Modify this based on your logic
+
+            if (fieldType === 'text' || fieldType === 'email' || fieldType === 'number') {
+                var name = $(this).find('input:first').attr('name');
+                var inputvalue = $(this).find('input:first').val();
+                var placeholder = $(this).find('input:first').attr('placeholder');
+            }
+
+            var fieldData = {
+                name: name ? name : null,
+                label: label,
+                placeholder: placeholder,
+                type: fieldType,
+                value: inputvalue,
+                required: required,
+            };
+
+            if (fieldType === 'radio' || fieldType === 'checkbox') {
+                var options = [];
+                $(this).find('input[type="' + fieldType + '"]').each(function () {
+                    options.push({
+                        label: $(this).next('label').text(),
+                        name: $(this).attr('name'),
+                        id: $(this).attr('id'),
+                        value: $(this).val(),
+                        checked: $(this).prop('checked'),
+                    });
+                });
+                fieldData.options = options;
+            } else if (fieldType === 'select') {
+                var options = [];
+                fieldData.name = $(this).find('select').attr('name');
+                fieldData.value = $(this).find('select').val();
+                $(this).find('select option').each(function () {
+                    options.push({
+                        label: $(this).text(),
+                        value: $(this).val(),
+                    });
+                });
+                fieldData.options = options;
+            }
+
+            formFields.push(fieldData);
+        });
+
+        // Send the form data to the controller using AJAX
+        $.ajax({
+            url: submitformdata_route, // Change this to the actual route name
+            method: 'POST',
+            dataType: 'json',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: {
+                formData: JSON.stringify(formFields),
+                societyId: $('input[name="society_id"]').val(),
+                formId: $('input[name="form_id"]').val(),
+                formActive: $('input[name="form_active"]').val(),
+                form_title: $('#form_title').text(),
+            },
+            success: function (response) {
+                if (response.success) {
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Form submitted successfully.'
+                    });
+                    window.location.href = response.redirect
+                } else if (response.success == "not_active") {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Form is not active.'
+                    });
+                    window.location.href = response.redirect
+                } else {
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Form is empty.'
+                    });
+                }
+            },
+            error: function (error) {
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Something went wrong.'
+                });
+            }
+        });
+    });
+
+
+    $('#accepted').on('change', function () {
+        var isChecked = $(this).is(':checked');
+        var userID = $('input[name="user_id"]').val();
+        var responseID = $('input[name="form_id"]').val();
+        var societyId = $('input[name="society_id"]').val();
+
+        $.ajax({
+            url: form_status_update,
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: {
+                accepted: isChecked,
+                userID: userID,
+                responseID: responseID,
+                societyId: societyId,
+            },
+            success: function (response) {
+                console.log(response);
+                if (response.success) {
+                    Toast.fire({
+                        icon: 'success',
+                        title: response.message
+                    });
+                } else {
+                    Toast.fire({
+                        icon: 'error',
+                        title: response.message
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                // Handle the error if needed
+                console.error('Ajax request failed: ' + error);
+            }
+        });
+    });
+
+    function fetchAndUpdateDiscussions() {
+        var societyId = $('input[name="societyID"]').val();
+
+        $.ajax({
+            url: fetchDiscussions,
+            method: 'GET',
+            dataType: 'json',
+            data: {
+                societyId: societyId,
+            },
+            success: function (data) {
+                var discussionsHtml = '';
+
+                $.each(data, function (index, discussion) {
+                    discussionsHtml += '<div class="direct-chat-msg ' + discussion.username_alignment_class + '">';
+                    discussionsHtml += '<div class="direct-chat-infos clearfix">';
+                    discussionsHtml += '<span class="direct-chat-name float-' + discussion.username_alignment_class + '">' + discussion.user_name + '</span>';
+                    discussionsHtml += '<span class="direct-chat-timestamp float-' + discussion.time_alignment_class + '">' + discussion.created_at + '</span>';
+                    discussionsHtml += '</div>';
+                    discussionsHtml += '<img class="direct-chat-img" src="' + discussion.user_avatar + '" alt="User Image">';
+                    discussionsHtml += '<div class="direct-chat-text">' + discussion.message + '</div>';
+                    discussionsHtml += '</div>';
+                });
+
+                $('.direct-chat-messages').html(discussionsHtml);
+            }
+        });
+    }
+
+    // Update discussions every 5 seconds
+    setInterval(fetchAndUpdateDiscussions, 5000);
+
+    $('#send_message').click(function (e) {
+        e.preventDefault();
+
+        var message = $('input[name="message"]').val();
+        var societyId = $('input[name="societyID"]').val();
+
+        $.ajax({
+            url: saveDiscussions,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                societyId: societyId,
+                message: message,
+                _token: csrf_token
+            },
+            success: function (data) {
+                if (data.success) {
+                    $('input[name="message"]').val('');
+
+                    fetchAndUpdateDiscussions();
+                } else {
+                    // Handle error, if needed
+                }
+            }
+        });
+    });
+
 
 });
 

@@ -5,6 +5,9 @@ namespace Modules\Society\Http\Controllers;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
+use Modules\Society\Entities\Discussion;
+use Modules\Society\Entities\FormResponse;
 use Modules\Society\Entities\SocietyMembers;
 use Modules\Society\Entities\Society;
 use Modules\Society\Entities\SocietyForms;
@@ -47,21 +50,31 @@ class SocietyController extends Controller
     public function view_society($id)
     {
         // Fetch all society records from the database
-        $society = Society::with(['members.student', 'societyForm'])->find($id);
+        $society = Society::with(['members.user', 'societyForm'])->find($id);
 
         $totalMembers = SocietyMembers::where('society_id', $id)->count();
 
         $society_forms = SocietyForms::where('society_id', $id)->get();
         $society_forms_count = SocietyForms::where('society_id', $id)->count();
 
-        // echo "<pre>";
-        // print_r($society_forms_count);
-        // exit;
+        $society_form_responses = FormResponse::with(['forms', 'users', 'users.student', 'users.staff'])
+            ->where('society_id', $id)
+            ->whereHas('forms', function ($query) {
+                $query->where('active', true);
+            })
+            ->get();
 
+        $society_form_responses_count = FormResponse::where('society_id', $id)->count();
 
         $society->totalMembers = $totalMembers;
         $society->society_forms = $society_forms;
         $society->society_forms_count = $society_forms_count;
+        $society->society_form_responses = $society_form_responses;
+        $society->society_form_responses_count = $society_form_responses_count;
+
+        // echo "<pre>";
+        // print_r($society_form_responses->toArray());
+        // exit;
 
         return view('society::view_society', ['society' => $society]);
     }
@@ -258,7 +271,8 @@ class SocietyController extends Controller
 
         return json_encode(array(
             'success' => true,
-            'message' => "Form created Successfully."
+            'message' => "Form created Successfully.",
+            'redirect' => route('society.view', $request->societyId)
         ));
 
         die();
@@ -312,7 +326,7 @@ class SocietyController extends Controller
     public function form_active(Request $request, $sid, $fid)
     {
         // Update all records in SocietyForms table
-        SocietyForms::where('active', true)->update(['active' => false]);
+        SocietyForms::where('society_id', $sid)->where('active', true)->update(['active' => false]);
 
         $society_form = SocietyForms::find($fid);
 
@@ -330,5 +344,233 @@ class SocietyController extends Controller
         } else {
             return redirect()->back()->withErrors("Form not found.");
         }
+    }
+
+    /**
+     * Show the specified resource from storage.
+     * @param int $id
+     * @return Renderable
+     */
+    public function submit_form_data(Request $request)
+    {
+        if (empty(json_decode($request->formData))) {
+            return json_encode(array(
+                'success' => false,
+                'message' => "Form is empty."
+            ));
+            die();
+        }
+
+        if ($request->formActive) {
+            $society_form_response = new FormResponse();
+            $society_form_response->society_id = $request->societyId;
+            $society_form_response->user_id = Auth::id();
+            $society_form_response->form_id = $request->formId;
+            $society_form_response->form_title = $request->form_title;
+            $society_form_response->form_data = $request->formData;
+            $society_form_response->save();
+
+            if (auth()->user()->role == 'student') {
+                return json_encode(array(
+                    'success' => true,
+                    'message' => "Form submited Successfully.",
+                    'redirect' => route('student.view.society', $request->societyId)
+                ));
+            }
+
+            return json_encode(array(
+                'success' => true,
+                'message' => "Form submited Successfully.",
+                'redirect' => route('society.view', $request->societyId)
+            ));
+        } else {
+            if (auth()->user()->role == 'student') {
+                return json_encode(array(
+                    'success' => 'not_active',
+                    'message' => "Form is not active.",
+                    'redirect' => route('student.view.society', $request->societyId)
+                ));
+            }
+
+            return json_encode(array(
+                'success' => 'not_active',
+                'message' => "Form is not active.",
+                'redirect' => route('society.view', $request->societyId)
+            ));
+        }
+
+        die();
+    }
+
+    /**
+     * Show the specified resource from storage.
+     * @param int $id
+     * @return Renderable
+     */
+    public function view_society_registrationforms(Request $request)
+    {
+        $society_forms = SocietyForms::with('society')->get();
+
+        $society_forms_count = SocietyForms::all()->count();
+        return view('society::view_registration_form', ['society_forms' => $society_forms, 'society_forms_count' => $society_forms_count]);
+    }
+
+    /**
+     * Show the specified resource from storage.
+     * @param int $id
+     * @return Renderable
+     */
+    public function view_society_form_response(Request $request, $sid, $fid)
+    {
+        $society_form = FormResponse::with(['society', 'users', 'users.student', 'users.staff'])->find($fid);
+        $society_form->form_data = json_decode($society_form->form_data);
+
+        return view('society::view_society_form_response', ['society_form' => $society_form]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     * @param int $id
+     * @return Renderable
+     */
+    public function form_response_destroy($sid, $fid)
+    {
+        $form = FormResponse::find($fid);
+
+        if (!empty($form)) {
+
+            // Delete the form record
+            $form->delete();
+
+            return redirect()->back()->withSuccess("The form Response has been deleted successfully.");
+        } else {
+            return redirect()->back()->withErrors("Failed to delete the form Response. Please try again later.");
+        }
+    }
+
+    /**
+     * Add members.
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function add_member_to_society(Request $request)
+    {
+        $response = FormResponse::where('id', $request->responseID)
+            ->where('society_id', $request->societyId)
+            ->where('user_id', $request->userID)
+            ->first();
+
+        if ($response) {
+            $isChecked = $request->accepted;
+            $status = $isChecked == 'true' ? 'accept' : 'pending';
+
+            $response->update(['status' => $status]);
+
+            if ($status == 'accept') {
+                // Check if the member record already exists
+                $existingMember = SocietyMembers::where('user_id', $request->userID)
+                    ->where('society_id', $request->societyId)
+                    ->first();
+
+                if (!$existingMember) {
+                    $member = new SocietyMembers();
+                    $member->user_id = $request->userID;
+                    $member->society_id = $request->societyId;
+                    $member->save();
+                }
+            } elseif ($status == 'pending') {
+                SocietyMembers::where('user_id', $request->userID)
+                    ->where('society_id', $request->societyId)
+                    ->delete();
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "Response Status Updated.",
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Form response not found.'
+        ]);
+    }
+
+    public function societies_discussions() {
+        // Fetch all society records from the database
+        $societies = Society::all();
+        // Calculate the total members for each society
+        foreach ($societies as $society) {
+            $totalMembers = SocietyMembers::where('society_id', $society->id)->count();
+            $society->totalMembers = $totalMembers; // Add the totalMembers property to the $society object
+        }
+
+        return view("society::socities_discussion", ['societies' => $societies]);
+    }
+
+    public function society_discussions($societyID) {
+        // Fetch society record from the database
+        $society = Society::with(['members.student', 'societyForm'])->find($societyID);
+        $totalMembers = SocietyMembers::where('society_id', $societyID)->count();
+        $society->totalMembers = $totalMembers;
+
+        // Fetch discussions of the society
+        $discussions = Discussion::with('users.staff', 'society')->where('society_id', $societyID)->get();
+        $society->discussions = $discussions;
+
+        // echo "<pre>";
+        // print_r($society->discussions->toArray());
+        // exit;
+
+        return view("society::society_discussion", ['society' => $society]);
+    }
+
+    public function fetchDiscussions(Request $request)
+    {
+        // Fetch discussions of the society
+        $discussions = Discussion::with('users', 'society')->where('society_id', $request->societyId)->get();
+
+        $formattedDiscussions = [];
+
+        foreach ($discussions as $discussion) {
+            $isMine = $discussion->user_id === auth()->user()->id;
+            $usernameAlignmentClass = $isMine ? 'right' : 'left';
+            $timeAlignmentClass = $isMine ? 'left' : 'right';
+
+            if($discussion->users->role == 'admin' || $discussion->users->role == 'staff') {
+                $image_path = isset($discussion->users->staff->image_path) && $discussion->users->staff->image_path ? 'uploads/staff/uploads/' . $discussion->users->staff->image_path : 'images/user-thumb.jpg';
+            } else {
+                $image_path = isset($discussion->users->student->image_path) && $discussion->users->student->image_path ? 'uploads/students/uploads/' . $discussion->users->student->image_path : 'images/user-thumb.jpg';
+            }
+
+            $formattedDiscussion = [
+                'user_name' => $discussion->users->username,
+                'user_avatar' => asset($image_path),
+                'message' => $discussion->message,
+                'created_at' => $discussion->created_at->format('d M h:i a'),
+                'is_mine' => $discussion->user_id === auth()->user()->id,
+                'username_alignment_class' => $usernameAlignmentClass,
+                'time_alignment_class' => $timeAlignmentClass,
+            ];
+
+            $formattedDiscussions[] = $formattedDiscussion;
+        }
+
+        return response()->json($formattedDiscussions);
+    }
+
+    public function saveDiscussions(Request $request)
+    {
+        // Validate input, if needed
+        // print_r($request->all());
+        // exit;
+
+        $discussion = new Discussion();
+        $discussion->society_id = $request->societyId;
+        $discussion->user_id = auth()->user()->id;
+        $discussion->message = $request->message;
+        $discussion->save();
+
+        return response()->json(['success' => true]);
     }
 }

@@ -15,4 +15,9 @@ class SocietyForms extends Model
     {
         return \Modules\Society\Database\factories\SocietyFormsFactory::new();
     }
+
+    public function society()
+    {
+        return $this->belongsTo(Society::class, 'society_id');
+    }
 }

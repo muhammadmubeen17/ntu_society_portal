@@ -45,7 +45,7 @@ class StaffController extends Controller
             'email' => 'required|unique:users,email|email',
             'password' => 'required|min:8',
             'phone' => 'required|min:11',
-            'user_role' => 'required',
+            // 'user_role' => 'required',
             'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
@@ -55,7 +55,7 @@ class StaffController extends Controller
         $phone = $request->phone;
         $password = $request->password;
         $is_active = $request->is_active;
-        $user_role = $request->user_role;
+        // $user_role = $request->user_role;
 
         $staff = new Staff();
 
@@ -71,7 +71,7 @@ class StaffController extends Controller
         $staff->phone_number = $phone;
         $staff->password = Hash::make($password);
         $staff->is_active = !empty($is_active) ? '1' : '0';
-        $staff->role = $user_role;
+        // $staff->role = $user_role;
 
         $staff->save();
 
@@ -127,7 +127,7 @@ class StaffController extends Controller
             'email' => "required|email|unique:users,email,$user->id",
             'password' => 'nullable|min:8',
             'phone' => 'required|min:11',
-            'user_role' => 'required',
+            // 'user_role' => 'required',
             'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
@@ -143,7 +143,7 @@ class StaffController extends Controller
         }
 
         $staff->is_active = $request->has('is_active') ? '1' : '0';
-        $staff->role = $request->input('user_role');
+        // $staff->role = $request->input('user_role');
 
         if ($request->hasFile('image_path')) {
             // Delete previous image
